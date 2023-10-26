@@ -58,7 +58,6 @@ exports.login = async (req, res) => {
       return res.status(500).send('invalide email try again');
     }
 
-    const hashedPassword = await hashPassword(password);
     const passwordMatch = await verifyHashedPassword(password, user.password);
 
     if (!passwordMatch) {
