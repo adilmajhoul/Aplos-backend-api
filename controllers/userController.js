@@ -5,19 +5,27 @@ const { hashPassword } = require('../utils/hashPassword');
 exports.createUser = async (req, res) => {
   try {
     let { name, email, password } = req.body;
-    name = name.trim();
-    email = email.trim();
-    password = password.trim();
 
-    const user = User.findOne({ email: email });
-    if (user) {
+    const isUserExists = User.findOne({ email: email });
+    if (isUserExists) {
       throw error('this email already exists');
     }
 
-    cosnt hashedPassword = await hashPassword(password)
+    const hashedPassword = await hashPassword(password);
+
+    const data = {
+      name: name.trim(),
+      email: email.trim(),
+      password: hashedPassword,
+    };
+    const user = User.create(data);
+
+    if (user) {
+      res.status(204).send(user);
+    } else {
+      res.status(500).send('failed to create user try again please');
+    }
   } catch (error) {
     throw error(error.message);
   }
-
-  next();
 };
