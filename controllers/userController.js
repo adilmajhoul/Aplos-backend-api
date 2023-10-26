@@ -59,7 +59,7 @@ exports.login = async (req, res) => {
     }
 
     const hashedPassword = await hashPassword(password);
-    const passwordMatch = await verifyHashedPassword(password, hashedPassword);
+    const passwordMatch = await verifyHashedPassword(password, user.password);
 
     if (!passwordMatch) {
       return res.status(500).send('invalide password try again');
