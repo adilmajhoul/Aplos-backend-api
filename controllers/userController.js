@@ -18,6 +18,7 @@ exports.createUser = async (req, res) => {
       email: email.trim(),
       password: hashedPassword,
     };
+
     const user = User.create(data);
 
     if (user) {

@@ -15,7 +15,7 @@ exports.validateEmailPass = async (req, res, next) => {
       throw error('password too short enter 6 character or more');
     }
   } catch (error) {
-    throw error(error.message);
+    res.status(400).send(error.message);
   }
 
   next();
