@@ -4,6 +4,6 @@ const router = express.Router;
 const { validateEmailPass } = require('../middleware/validateEmailPass');
 const { createUser } = require('../controllers/userController.js');
 
-router.get('/signup', validateEmailPass, createUser);
+router.post('/signup', validateEmailPass, createUser);
 
 module.exports = router;
