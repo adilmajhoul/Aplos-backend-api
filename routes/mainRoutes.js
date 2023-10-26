@@ -1,9 +1,22 @@
 const express = require('express');
-const router = express.Router;
+const router = express.Router();
 
-const { validateEmailPass } = require('../middleware/validateEmailPass');
-const { createUser } = require('../controllers/userController.js');
+const {
+  createUser,
+  getAllUsers,
+  login,
+} = require('../controllers/userController');
+const {
+  validateEmailPassLogin,
+} = require('../middleware/validateEmailPassLogin');
+const {
+  validateEmailPassSignup,
+} = require('../middleware/validateEmailPassSignup');
 
-router.post('/signup', validateEmailPass, createUser);
+router.post('/signup', validateEmailPassSignup, createUser);
+
+router.get('/:login', validateEmailPassLogin, login);
+
+router.get('/getallusers', getAllUsers);
 
 module.exports = router;

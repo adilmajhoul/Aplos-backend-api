@@ -1,14 +1,15 @@
-const User = require('../models/userModel');
+const { User } = require('../models/userModel');
 
-const { hashPassword } = require('../utils/hashPassword');
+const { hashPassword, verifyHashedPassword } = require('../utils/hashing');
+const { createJwtToken } = require('../utils/createJwtToken');
 
 exports.createUser = async (req, res) => {
   try {
     let { name, email, password } = req.body;
 
-    const isUserExists = User.findOne({ email: email });
+    const isUserExists = await User.findOne({ email: email });
     if (isUserExists) {
-      throw error('this email already exists');
+      return res.status(500).send('this email already exists');
     }
 
     const hashedPassword = await hashPassword(password);
@@ -19,14 +20,60 @@ exports.createUser = async (req, res) => {
       password: hashedPassword,
     };
 
-    const user = User.create(data);
+    const user = await User.create(data);
 
     if (user) {
-      res.status(204).send(user);
+      return res.status(200).json(user);
     } else {
-      res.status(500).send('failed to create user try again please');
+      return res.status(500).send('failed to create user try again please');
     }
   } catch (error) {
-    throw error(error.message);
+    return res.status(500).send(error.message);
+  }
+};
+exports.getAllUsers = async (req, res) => {
+  try {
+    const allUsers = await User.find();
+
+    if (!allUsers) {
+      res.status(500).send('no users found in the database');
+    } else {
+      res.status(200).json(allUsers);
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+exports.login = async (req, res) => {
+  try {
+    let { email, password } = req.body;
+
+    const data = {
+      email: email.trim(),
+    };
+
+    const user = await User.findOne(data);
+    if (!user) {
+      return res.status(500).send('invalide email try again');
+    }
+
+    const hashedPassword = await hashPassword(password);
+    const passwordMatch = await verifyHashedPassword(password, hashedPassword);
+
+    if (!passwordMatch) {
+      return res.status(500).send('invalide password try again');
+    } else {
+      // return res.status(500).send('failed to create user try again please');
+
+      const tokenData = { userId: user._id, email };
+      const token = await createJwtToken(tokenData);
+
+      user.token = token;
+
+      return res.status(200).json(user);
+    }
+  } catch (error) {
+    return res.status(500).send(error.message);
   }
 };

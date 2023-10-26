@@ -10,6 +10,6 @@ const historySchema = new Schema(
   { timestamps: true }
 );
 
-const History = mongoose.model('history', collectionSchema);
+const History = mongoose.model('history', historySchema);
 
 module.exports = { History };
